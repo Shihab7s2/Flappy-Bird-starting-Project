@@ -3,84 +3,91 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class LoginFrame extends JFrame implements ActionListener {
-    JLabel titleLabel, userLabel, passLabel;
-    JTextField userField;
-    JPasswordField passField;
-    JButton loginButton, registerButton;
-    UserManager userManager = new UserManager();
+
+    JLabel title, userLbl, passLbl;
+    JTextField userTxt;
+    JPasswordField passTxt;
+    JButton btnLogin, btnRegister;
+
+    UserManager um = new UserManager();
 
     LoginFrame() {
+
         setTitle("Flappy Bird Login");
-        setSize(350, 250);
+        setSize(360, 260);
         setLayout(null);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        titleLabel = new JLabel("Login");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
-        titleLabel.setBounds(140, 20, 100, 30);
+        title = new JLabel("Login");
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        title.setBounds(140, 20, 100, 30);
 
-        userLabel = new JLabel("Username:");
-        userLabel.setBounds(40, 70, 80, 25);
+        userLbl = new JLabel("Username:");
+        userLbl.setBounds(40, 70, 100, 25);
 
-        userField = new JTextField();
-        userField.setBounds(130, 70, 150, 25);
+        userTxt = new JTextField();
+        userTxt.setBounds(130, 70, 160, 25);
 
-        passLabel = new JLabel("Password:");
-        passLabel.setBounds(40, 110, 80, 25);
+        passLbl = new JLabel("Password:");
+        passLbl.setBounds(40, 110, 100, 25);
 
-        passField = new JPasswordField();
-        passField.setBounds(130, 110, 150, 25);
+        passTxt = new JPasswordField();
+        passTxt.setBounds(130, 110, 160, 25);
 
-        loginButton = new JButton("Login");
-        loginButton.setBounds(60, 160, 90, 30);
-        loginButton.addActionListener(this);
+        btnLogin = new JButton("Login");
+        btnLogin.setBounds(60, 170, 90, 30);
 
-        registerButton = new JButton("Register");
-        registerButton.setBounds(180, 160, 100, 30);
-        registerButton.addActionListener(this);
+        btnRegister = new JButton("Register");
+        btnRegister.setBounds(180, 170, 100, 30);
 
-        add(titleLabel);
-        add(userLabel);
-        add(userField);
-        add(passLabel);
-        add(passField);
-        add(loginButton);
-        add(registerButton);
+        btnLogin.addActionListener(this);
+        btnRegister.addActionListener(this);
+
+        add(title);
+        add(userLbl);
+        add(userTxt);
+        add(passLbl);
+        add(passTxt);
+        add(btnLogin);
+        add(btnRegister);
 
         setVisible(true);
     }
 
     public void actionPerformed(ActionEvent e) {
-        String username = userField.getText();
-        String password = String.valueOf(passField.getPassword());
 
-        if (e.getSource() == loginButton) {
-            if (userManager.loginUser(username, password)) {
-                JOptionPane.showMessageDialog(this, "Login Successful!");
+        String user = userTxt.getText();
+        String pass = new String(passTxt.getPassword());
+
+        if (e.getSource() == btnLogin) {
+
+            if (um.loginUser(user, pass)) {
+                JOptionPane.showMessageDialog(this, "Login Successful");
                 dispose();
                 openGame();
             } else {
-                JOptionPane.showMessageDialog(this, "Invalid Username or Password");
+                JOptionPane.showMessageDialog(this, "Wrong username or password");
             }
         }
 
-        if (e.getSource() == registerButton) {
+        if (e.getSource() == btnRegister) {
             new RegisterFrame();
         }
     }
 
-    public void openGame() {
-        JFrame frame = new JFrame("Flappy Bird");
-        FlappyBird flappyBird = new FlappyBird();
+    void openGame() {
 
-        frame.add(flappyBird);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        JFrame f = new JFrame("Flappy Bird");
+        FlappyBird game = new FlappyBird();
 
-        flappyBird.requestFocus();
+        f.add(game);
+        f.pack();
+        f.setLocationRelativeTo(null);
+        f.setResizable(false);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
+
+        game.requestFocus();
     }
 }

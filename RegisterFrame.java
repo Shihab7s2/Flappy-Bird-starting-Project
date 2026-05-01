@@ -3,73 +3,74 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class RegisterFrame extends JFrame implements ActionListener {
-    JLabel titleLabel, contactLabel, userLabel, passLabel;
-    JTextField contactField, userField;
-    JPasswordField passField;
-    JButton createButton;
-    UserManager userManager = new UserManager();
 
-    RegisterFrame() {
-        setTitle("Register");
-        setSize(380, 300);
-        setLayout(null);
-        setLocationRelativeTo(null);
+    JLabel title, contactLbl, userLbl, passLbl;
+    JTextField contactTxt, userTxt;
+    JPasswordField passTxt;
+    JButton btnCreate;
 
-        titleLabel = new JLabel("Registration");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 22));
-        titleLabel.setBounds(120, 20, 150, 30);
+    UserManager um = new UserManager();
 
-        contactLabel = new JLabel("Email/Phone:");
-        contactLabel.setBounds(40, 70, 100, 25);
+    public RegisterFrame() {
 
-        contactField = new JTextField();
-        contactField.setBounds(150, 70, 170, 25);
+     setTitle("Register Form");
+    setSize(400, 320);
+     setLayout(null);
+     setLocationRelativeTo(null);
 
-        userLabel = new JLabel("Username:");
-        userLabel.setBounds(40, 110, 100, 25);
+     title = new JLabel("Register Here");
+     title.setFont(new Font("Arial", Font.BOLD, 20));
+     title.setBounds(120, 15, 200, 30);
 
-        userField = new JTextField();
-        userField.setBounds(150, 110, 170, 25);
+     contactLbl = new JLabel("Email / Phone:");
+    contactLbl.setBounds(30, 70, 120, 25);
 
-        passLabel = new JLabel("Password:");
-        passLabel.setBounds(40, 150, 100, 25);
+     contactTxt = new JTextField();
+     contactTxt.setBounds(150, 70, 180, 25);
 
-        passField = new JPasswordField();
-        passField.setBounds(150, 150, 170, 25);
+    userLbl = new JLabel("Username:");
+    userLbl.setBounds(30, 110, 100, 25);
 
-        createButton = new JButton("Create Account");
-        createButton.setBounds(115, 210, 140, 30);
-        createButton.addActionListener(this);
+     userTxt = new JTextField();
+     userTxt.setBounds(150, 110, 180, 25);
 
-        add(titleLabel);
-        add(contactLabel);
-        add(contactField);
-        add(userLabel);
-        add(userField);
-        add(passLabel);
-        add(passField);
-        add(createButton);
+     passLbl = new JLabel("Password:");
+     passLbl.setBounds(30, 150, 100, 25);
+
+    passTxt = new JPasswordField();
+     passTxt.setBounds(150, 150, 180, 25);
+
+     btnCreate = new JButton("Create");
+     btnCreate.setBounds(130, 210, 120, 30);
+     btnCreate.addActionListener(this);
+
+     add(title);
+     add(contactLbl);
+     add(contactTxt);
+    add(userLbl);       
+     add(userTxt);
+     add(passLbl);
+     add(passTxt);
+     add(btnCreate);
 
         setVisible(true);
     }
 
     public void actionPerformed(ActionEvent e) {
-        String contact = contactField.getText();
-        String username = userField.getText();
-        String password = String.valueOf(passField.getPassword());
 
-        if (contact.isEmpty() || username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please fill all fields.");
-            return;
+        String contact = contactTxt.getText();
+        String user = userTxt.getText();
+        String pass = new String(passTxt.getPassword());
+
+        if(contact.equals("") || user.equals("") || pass.equals("")) {
+            JOptionPane.showMessageDialog(this, "Fill all fields first!"); }
+        else { if(um.userExists(user)) {
+                JOptionPane.showMessageDialog(this, "This username is taken!");
+            }
+            else { um.registerUser(contact, user, pass);
+                JOptionPane.showMessageDialog(this, "Account created successfully!");
+                dispose();
+            }
         }
-
-        if (userManager.userExists(username)) {
-            JOptionPane.showMessageDialog(this, "Username already exists.");
-            return;
-        }
-
-        userManager.registerUser(contact, username, password);
-        JOptionPane.showMessageDialog(this, "Registration Successful!");
-        dispose();
     }
 }

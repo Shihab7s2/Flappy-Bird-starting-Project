@@ -1,55 +1,56 @@
 import java.io.*;
 
 public class UserManager {
-    private final String FILE_NAME = "users.txt";
 
-    public void registerUser(String contact, String username, String password) {
+    String file = "users.txt";
+
+    void registerUser(String contact, String user, String pass) {
         try {
-            FileWriter fw = new FileWriter(FILE_NAME, true);
-            fw.write(contact + "," + username + "," + password + "\n");
-            fw.close();
-        } catch (IOException e) {
-            System.out.println("Error saving user.");
+            FileWriter f = new FileWriter(file, true);
+            f.write(contact + "," + user + "," + pass + "\n");
+            f.close();
+        } catch (Exception e) {
+            System.out.println("Save error");
         }
     }
-
-    public boolean loginUser(String username, String password) {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(FILE_NAME));
+    boolean loginUser(String user, String pass) {
+ try {
+            BufferedReader r = new BufferedReader(new FileReader(file));
             String line;
 
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 3) {
-                    if (data[1].equals(username) && data[2].equals(password)) {
-                        br.close();
+            while (true) {
+                line = r.readLine();
+                if (line == null) break;
+                String[] arr = line.split(",");
+  if (arr.length == 3) {
+                if (arr[1].equals(user) && arr[2].equals(pass)) {
+                       r.close();
                         return true;
                     }
                 }
             }
-            br.close();
-        } catch (IOException e) {
-            System.out.println("Error reading user file.");
-        }
-        return false;
-    }
+            r.close();
+        } catch (Exception e) {
+            System.out.println("Read error");
+        } return false;
+    } boolean userExists(String user) {
 
-    public boolean userExists(String username) {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(FILE_NAME));
+        try { BufferedReader r = new BufferedReader(new FileReader(file));
             String line;
 
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 3 && data[1].equals(username)) {
-                    br.close();
+            while ((line = r.readLine()) != null) {
+           String[] arr = line.split(",");
+
+                if (arr.length == 3 && arr[1].equals(user)) {
+                    r.close();
                     return true;
                 }
             }
-            br.close();
-        } catch (IOException e) {
+            r.close();
+        } catch (Exception e) {
             return false;
         }
+
         return false;
     }
 }

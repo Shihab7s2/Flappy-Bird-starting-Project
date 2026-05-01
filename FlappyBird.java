@@ -5,173 +5,138 @@ import javax.swing.*;
 
 public class FlappyBird extends JPanel implements ActionListener, KeyListener {
 
-    int boardWidth = 360;
-    int boardHeight = 640;
+    int width = 360;
+    int height = 640;
+    Image bg, birdImg, topImg, bottomImg;
+    int bx = 50, by = 250;
+    int bw = 34, bh = 24;
 
-    Image backgroundImg;
-    Image birdImg;
-    Image topPipeImg;
-    Image bottomPipeImg;
-
-    int birdX = 50;
-    int birdY = 250;
-    int birdWidth = 34;
-    int birdHeight = 24;
-
-    int velocityY = 0;
+    int velY = 0;
     int gravity = 1;
 
-    int pipeWidth = 64;
-    int pipeHeight = 512;
-    int pipeSpeed = -4;
+    int pipeW = 64, pipeH = 512;
+    int speed = -4;
 
-    ArrayList<Pipe> pipes = new ArrayList<>();
+    ArrayList<Pipe> list = new ArrayList<>();
 
-    Timer gameLoop;
-    Timer pipeTimer;
-
-    boolean gameOver = false;
+    Timer loop;
+    Timer pipeLoop;
+  boolean over = false;
     double score = 0;
 
     class Pipe {
-        int x;
-        int y;
+        int x, y;
         Image img;
-        boolean passed = false;
+        boolean done = false;
 
-        Pipe(int x, int y, Image img) {
+     Pipe(int x, int y, Image img) {
             this.x = x;
             this.y = y;
             this.img = img;
         }
     }
-
-    FlappyBird() {
-        setPreferredSize(new Dimension(boardWidth, boardHeight));
+     FlappyBird() {
+        setPreferredSize(new Dimension(width, height));
         setFocusable(true);
         addKeyListener(this);
 
-        backgroundImg = new ImageIcon("flappybirdbg.png").getImage();
+        bg = new ImageIcon("flappybirdbg.png").getImage();
         birdImg = new ImageIcon("flappybird.png").getImage();
-        topPipeImg = new ImageIcon("toppipe.png").getImage();
-        bottomPipeImg = new ImageIcon("bottompipe.png").getImage();
+        topImg = new ImageIcon("toppipe.png").getImage();
+        bottomImg = new ImageIcon("bottompipe.png").getImage();
 
-        gameLoop = new Timer(1000 / 60, this);
-        gameLoop.start();
+        loop = new Timer(1000/60, this);
+        loop.start();
 
-        pipeTimer = new Timer(1800, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addPipes();
+        pipeLoop = new Timer(1800, new ActionListener() {
+            public void actionPerformed(ActionEvent e) { addPipe();
             }
         });
-        pipeTimer.start();
+        pipeLoop.start();
     }
-
-    public void addPipes() {
-        int randomY = -200 - (int)(Math.random() * 150);
+ void addPipe() {
+        int y = -200 - (int)(Math.random() * 150);
         int gap = 160;
 
-        Pipe topPipe = new Pipe(boardWidth, randomY, topPipeImg);
-        Pipe bottomPipe = new Pipe(boardWidth, randomY + pipeHeight + gap, bottomPipeImg);
-
-        pipes.add(topPipe);
-        pipes.add(bottomPipe);
-    }
-
-    public void paintComponent(Graphics g) {
+        list.add(new Pipe(width, y, topImg));
+        list.add(new Pipe(width, y + pipeH + gap, bottomImg));
+    } public void paintComponent(Graphics g) {
         super.paintComponent(g);
+     g.drawImage(bg, 0, 0, width, height, null);
+        g.drawImage(birdImg, bx, by, bw, bh, null);
 
-        g.drawImage(backgroundImg, 0, 0, boardWidth, boardHeight, null);
-        g.drawImage(birdImg, birdX, birdY, birdWidth, birdHeight, null);
-
-        for (Pipe pipe : pipes) {
-            g.drawImage(pipe.img, pipe.x, pipe.y, pipeWidth, pipeHeight, null);
+        for (Pipe p : list) {
+            g.drawImage(p.img, p.x, p.y, pipeW, pipeH, null);
         }
+    g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 26));
 
-        g.setColor(Color.WHITE);
-        g.setFont(new Font("Arial", Font.BOLD, 28));
-
-        if (gameOver) {
+        if (over) {
             g.drawString("Game Over", 100, 280);
-            g.drawString("Score: " + (int) score, 115, 320);
+            g.drawString("Score: " + (int)score, 115, 320);
             g.setFont(new Font("Arial", Font.PLAIN, 16));
-            g.drawString("Press SPACE to Restart", 95, 360);
+            g.drawString("Press SPACE", 110, 360);
         } else {
-            g.drawString("Score: " + (int) score, 15, 35);
+            g.drawString("Score: " + (int)score, 15, 35);
         }
     }
 
-    public void move() {
-        if (gameOver) {
-            return;
+    void updateGame() {
+
+        if (over) return;
+     velY += gravity;
+        by += velY;
+     if (by < 0) {
+            by = 0;
+            velY = 0;
         }
-
-        velocityY += gravity;
-        birdY += velocityY;
-
-        if (birdY < 0) {
-            birdY = 0;
-            velocityY = 0;
+    if (by > height - bh) {
+            over = true;
         }
+    for (Pipe p : list) {
+            p.x += speed;
 
-        if (birdY > boardHeight - birdHeight) {
-            gameOver = true;
-        }
-
-        for (Pipe pipe : pipes) {
-            pipe.x += pipeSpeed;
-
-            if (!pipe.passed && birdX > pipe.x + pipeWidth) {
+    if (!p.done && bx > p.x + pipeW) {
                 score += 0.5;
-                pipe.passed = true;
+                p.done = true;
             }
-
-            if (collision(pipe)) {
-                gameOver = true;
+     if (hit(p)) {
+                over = true;
             }
         }
-
-        if (gameOver) {
-            pipeTimer.stop();
+     if (over) {
+            pipeLoop.stop();
         }
     }
-
-    public boolean collision(Pipe pipe) {
-        return birdX < pipe.x + pipeWidth &&
-               birdX + birdWidth > pipe.x &&
-               birdY < pipe.y + pipeHeight &&
-               birdY + birdHeight > pipe.y;
+     boolean hit(Pipe p) {
+        if (bx < p.x + pipeW &&
+            bx + bw > p.x &&
+            by < p.y + pipeH &&
+            by + bh > p.y) {
+            return true;
+        }
+        return false;
     }
-
-    public void resetGame() {
-        birdY = 250;
-        velocityY = 0;
-        pipes.clear();
+     void reset() {
+        by = 250;
+        velY = 0;
+        list.clear();
         score = 0;
-        gameOver = false;
-        pipeTimer.start();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        move();
+        over = false;
+        pipeLoop.start();
+    }   public void actionPerformed(ActionEvent e) {
+        updateGame();
         repaint();
     }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
+     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            if (gameOver) {
-                resetGame();
+            if (over) {
+                reset();
             } else {
-                velocityY = -10;
+                velY = -10;
             }
         }
-    }
-
-    @Override
+    }   
     public void keyReleased(KeyEvent e) {}
-
-    @Override
     public void keyTyped(KeyEvent e) {}
 }
