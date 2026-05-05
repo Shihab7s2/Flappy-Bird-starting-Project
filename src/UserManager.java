@@ -1,53 +1,84 @@
 import java.io.*;
 
 public class UserManager {
+    private String fileName = "users.txt";
 
-    String file = "users.txt";
+    private File getUserFile() {
+        return new File(fileName);
+    }
 
-    void registerUser(String contact, String user, String pass) {
+    public boolean registerUser(User user) {
+        if (isUsernameExists(user.getUsername())) {
+            return false;
+        }
+
         try {
-            FileWriter f = new FileWriter(file, true);
-            f.write(contact + "," + user + "," + pass + "\n");
-            f.close();
-        } catch (Exception e) {
-            System.out.println("Save error");
+            File file = getUserFile();
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            FileWriter writer = new FileWriter(file, true);
+            writer.write(user.getName() + "," + user.getEmail() + "," + user.getUsername() + "," + user.getPassword() + "\n");
+            writer.close();
+            return true;
+        } catch (IOException e) {
+            return false;
         }
     }
-    boolean loginUser(String user, String pass) {
- try {
-            BufferedReader r = new BufferedReader(new FileReader(file));
+
+    public boolean loginUser(String username, String password) {
+        try {
+            File file = getUserFile();
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
 
-            while (true) {
-                line = r.readLine();
-                if (line == null) break;
-                String[] arr = line.split(",");
-  if (arr.length == 3) {
-                if (arr[1].equals(user) && arr[2].equals(pass)) {
-                       r.close();
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+
+                if (data.length == 4) {
+                    if (data[2].equals(username) && data[3].equals(password)) {
+                        reader.close();
                         return true;
                     }
                 }
             }
-            r.close();
-        } catch (Exception e) {
-            System.out.println("Read error");
-        } return false;
-    } boolean userExists(String user) {
 
-        try { BufferedReader r = new BufferedReader(new FileReader(file));
+            reader.close();
+        } catch (IOException e) {
+            return false;
+        }
+
+        return false;
+    }
+
+    public boolean isUsernameExists(String username) {
+        try {
+            File file = getUserFile();
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
 
-            while ((line = r.readLine()) != null) {
-           String[] arr = line.split(",");
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
 
-                if (arr.length == 3 && arr[1].equals(user)) {
-                    r.close();
-                    return true;
+                if (data.length == 4) {
+                    if (data[2].equals(username)) {
+                        reader.close();
+                        return true;
+                    }
                 }
             }
-            r.close();
-        } catch (Exception e) {
+
+            reader.close();
+        } catch (IOException e) {
             return false;
         }
 

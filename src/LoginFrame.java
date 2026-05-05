@@ -3,91 +3,80 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class LoginFrame extends JFrame implements ActionListener {
+    JTextField usernameField;
+    JPasswordField passwordField;
+    JButton loginButton;
+    JButton registerButton;
+    UserManager userManager;
 
-    JLabel title, userLbl, passLbl;
-    JTextField userTxt;
-    JPasswordField passTxt;
-    JButton btnLogin, btnRegister;
-
-    UserManager um = new UserManager();
-
-    LoginFrame() {
+    public LoginFrame() {
+        userManager = new UserManager();
 
         setTitle("Flappy Bird Login");
-        setSize(360, 260);
-        setLayout(null);
+        setSize(400, 300);
         setLocationRelativeTo(null);
+        setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(null);
 
-        title = new JLabel("Login");
-        title.setFont(new Font("Arial", Font.BOLD, 20));
-        title.setBounds(140, 20, 100, 30);
+        JLabel titleLabel = new JLabel("Flappy Bird Login");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBounds(85, 25, 250, 35);
+        add(titleLabel);
 
-        userLbl = new JLabel("Username:");
-        userLbl.setBounds(40, 70, 100, 25);
+        JLabel usernameLabel = new JLabel("Username:");
+        usernameLabel.setBounds(60, 90, 100, 25);
+        add(usernameLabel);
 
-        userTxt = new JTextField();
-        userTxt.setBounds(130, 70, 160, 25);
+        usernameField = new JTextField();
+        usernameField.setBounds(150, 90, 170, 25);
+        add(usernameField);
 
-        passLbl = new JLabel("Password:");
-        passLbl.setBounds(40, 110, 100, 25);
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordLabel.setBounds(60, 130, 100, 25);
+        add(passwordLabel);
 
-        passTxt = new JPasswordField();
-        passTxt.setBounds(130, 110, 160, 25);
+        passwordField = new JPasswordField();
+        passwordField.setBounds(150, 130, 170, 25);
+        add(passwordField);
 
-        btnLogin = new JButton("Login");
-        btnLogin.setBounds(60, 170, 90, 30);
+        loginButton = new JButton("Login");
+        loginButton.setBounds(80, 185, 100, 30);
+        loginButton.addActionListener(this);
+        add(loginButton);
 
-        btnRegister = new JButton("Register");
-        btnRegister.setBounds(180, 170, 100, 30);
-
-        btnLogin.addActionListener(this);
-        btnRegister.addActionListener(this);
-
-        add(title);
-        add(userLbl);
-        add(userTxt);
-        add(passLbl);
-        add(passTxt);
-        add(btnLogin);
-        add(btnRegister);
+        registerButton = new JButton("Register");
+        registerButton.setBounds(200, 185, 100, 30);
+        registerButton.addActionListener(this);
+        add(registerButton);
 
         setVisible(true);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == loginButton) {
+            String username = usernameField.getText().trim();
+            String password = new String(passwordField.getPassword());
 
-        String user = userTxt.getText();
-        String pass = new String(passTxt.getPassword());
-
-        if (e.getSource() == btnLogin) {
-
-            if (um.loginUser(user, pass)) {
-                JOptionPane.showMessageDialog(this, "Login Successful");
-                dispose();
-                openGame();
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Username and password cannot be empty");
             } else {
-                JOptionPane.showMessageDialog(this, "Wrong username or password");
+                boolean success = userManager.loginUser(username, password);
+
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Login successful");
+                    dispose();
+                    new MenuFrame(username);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Wrong username or password");
+                }
             }
         }
 
-        if (e.getSource() == btnRegister) {
+        if (e.getSource() == registerButton) {
+            dispose();
             new RegisterFrame();
         }
-    }
-
-    void openGame() {
-
-        JFrame f = new JFrame("Flappy Bird");
-        FlappyBird game = new FlappyBird();
-
-        f.add(game);
-        f.pack();
-        f.setLocationRelativeTo(null);
-        f.setResizable(false);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
-
-        game.requestFocus();
     }
 }

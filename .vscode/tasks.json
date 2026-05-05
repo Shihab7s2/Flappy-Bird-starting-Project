@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Flappy Bird",
+      "type": "shell",
+      "command": "javac",
+      "args": [
+        "-d", "bin",
+        "src/App.java",
+        "src/User.java",
+        "src/UserManager.java",
+        "src/LoginFrame.java",
+        "src/RegisterFrame.java",
+        "src/MenuFrame.java",
+        "src/GameObject.java",
+        "src/Bird.java",
+        "src/Pipe.java",
+        "src/FlappyBird.java"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$javac"
+    }
+  ]
+}

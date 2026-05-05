@@ -3,74 +3,112 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class RegisterFrame extends JFrame implements ActionListener {
-
-    JLabel title, contactLbl, userLbl, passLbl;
-    JTextField contactTxt, userTxt;
-    JPasswordField passTxt;
-    JButton btnCreate;
-
-    UserManager um = new UserManager();
+    JTextField nameField;
+    JTextField emailField;
+    JTextField usernameField;
+    JPasswordField passwordField;
+    JButton registerButton;
+    JButton backButton;
+    UserManager userManager;
 
     public RegisterFrame() {
+        userManager = new UserManager();
 
-     setTitle("Register Form");
-    setSize(400, 320);
-     setLayout(null);
-     setLocationRelativeTo(null);
+        setTitle("Flappy Bird Registration");
+        setSize(430, 380);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(null);
 
-     title = new JLabel("Register Here");
-     title.setFont(new Font("Arial", Font.BOLD, 20));
-     title.setBounds(120, 15, 200, 30);
+        JLabel titleLabel = new JLabel("Create Account");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBounds(115, 25, 220, 35);
+        add(titleLabel);
 
-     contactLbl = new JLabel("Email / Phone:");
-    contactLbl.setBounds(30, 70, 120, 25);
+        JLabel nameLabel = new JLabel("Name:");
+        nameLabel.setBounds(60, 85, 100, 25);
+        add(nameLabel);
 
-     contactTxt = new JTextField();
-     contactTxt.setBounds(150, 70, 180, 25);
+        nameField = new JTextField();
+        nameField.setBounds(160, 85, 190, 25);
+        add(nameField);
 
-    userLbl = new JLabel("Username:");
-    userLbl.setBounds(30, 110, 100, 25);
+        JLabel emailLabel = new JLabel("Email:");
+        emailLabel.setBounds(60, 125, 100, 25);
+        add(emailLabel);
 
-     userTxt = new JTextField();
-     userTxt.setBounds(150, 110, 180, 25);
+        emailField = new JTextField();
+        emailField.setBounds(160, 125, 190, 25);
+        add(emailField);
 
-     passLbl = new JLabel("Password:");
-     passLbl.setBounds(30, 150, 100, 25);
+        JLabel usernameLabel = new JLabel("Username:");
+        usernameLabel.setBounds(60, 165, 100, 25);
+        add(usernameLabel);
 
-    passTxt = new JPasswordField();
-     passTxt.setBounds(150, 150, 180, 25);
+        usernameField = new JTextField();
+        usernameField.setBounds(160, 165, 190, 25);
+        add(usernameField);
 
-     btnCreate = new JButton("Create");
-     btnCreate.setBounds(130, 210, 120, 30);
-     btnCreate.addActionListener(this);
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordLabel.setBounds(60, 205, 100, 25);
+        add(passwordLabel);
 
-     add(title);
-     add(contactLbl);
-     add(contactTxt);
-    add(userLbl);       
-     add(userTxt);
-     add(passLbl);
-     add(passTxt);
-     add(btnCreate);
+        passwordField = new JPasswordField();
+        passwordField.setBounds(160, 205, 190, 25);
+        add(passwordField);
+
+        JLabel noteLabel = new JLabel("Password must be at least 6 characters");
+        noteLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        noteLabel.setBounds(160, 232, 230, 20);
+        add(noteLabel);
+
+        registerButton = new JButton("Register");
+        registerButton.setBounds(85, 280, 110, 32);
+        registerButton.addActionListener(this);
+        add(registerButton);
+
+        backButton = new JButton("Back");
+        backButton.setBounds(220, 280, 110, 32);
+        backButton.addActionListener(this);
+        add(backButton);
 
         setVisible(true);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == registerButton) {
+            String name = nameField.getText().trim();
+            String email = emailField.getText().trim();
+            String username = usernameField.getText().trim();
+            String password = new String(passwordField.getPassword());
 
-        String contact = contactTxt.getText();
-        String user = userTxt.getText();
-        String pass = new String(passTxt.getPassword());
+            if (name.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "All fields are required");
+            } else if (name.contains(",") || email.contains(",") || username.contains(",") || password.contains(",")) {
+                JOptionPane.showMessageDialog(this, "Comma is not allowed");
+            } else if (!email.contains("@") || !email.contains(".")) {
+                JOptionPane.showMessageDialog(this, "Enter a valid email");
+            } else if (password.length() < 6) {
+                JOptionPane.showMessageDialog(this, "Password must be at least 6 characters");
+            } else {
+                User user = new User(name, email, username, password);
+                boolean success = userManager.registerUser(user);
 
-        if(contact.equals("") || user.equals("") || pass.equals("")) {
-            JOptionPane.showMessageDialog(this, "Fill all fields first!"); }
-        else { if(um.userExists(user)) {
-                JOptionPane.showMessageDialog(this, "This username is taken!");
+                if (success) {
+                    JOptionPane.showMessageDialog(this, "Registration successful");
+                    dispose();
+                    new LoginFrame();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Username already exists");
+                }
             }
-            else { um.registerUser(contact, user, pass);
-                JOptionPane.showMessageDialog(this, "Account created successfully!");
-                dispose();
-            }
+        }
+
+        if (e.getSource() == backButton) {
+            dispose();
+            new LoginFrame();
         }
     }
 }
