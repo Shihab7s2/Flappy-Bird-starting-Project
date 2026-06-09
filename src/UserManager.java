@@ -19,7 +19,7 @@ public class UserManager {
             }
 
             FileWriter writer = new FileWriter(file, true);
-            writer.write(user.getName() + "," + user.getEmail() + "," + user.getUsername() + "," + user.getPassword() + "\n");
+            writer.write(user.getFullName() + "," + user.getEmail() + "," + user.getPhoneNumber() + "," + user.getUsername() + "," + user.getPassword() + "\n");
             writer.close();
             return true;
         } catch (IOException e) {
@@ -39,6 +39,13 @@ public class UserManager {
 
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
+
+                if (data.length == 5) {
+                    if (data[3].equals(username) && data[4].equals(password)) {
+                        reader.close();
+                        return true;
+                    }
+                }
 
                 if (data.length == 4) {
                     if (data[2].equals(username) && data[3].equals(password)) {
@@ -68,6 +75,13 @@ public class UserManager {
 
             while ((line = reader.readLine()) != null) {
                 String[] data = line.split(",");
+
+                if (data.length == 5) {
+                    if (data[3].equals(username)) {
+                        reader.close();
+                        return true;
+                    }
+                }
 
                 if (data.length == 4) {
                     if (data[2].equals(username)) {

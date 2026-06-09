@@ -3,10 +3,12 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class RegisterFrame extends JFrame implements ActionListener {
-    JTextField nameField;
+    JTextField fullNameField;
     JTextField emailField;
+    JTextField phoneNumberField;
     JTextField usernameField;
     JPasswordField passwordField;
+    JPasswordField confirmPasswordField;
     JButton registerButton;
     JButton backButton;
     UserManager userManager;
@@ -15,61 +17,78 @@ public class RegisterFrame extends JFrame implements ActionListener {
         userManager = new UserManager();
 
         setTitle("Flappy Bird Registration");
-        setSize(430, 380);
+        setSize(450, 500);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
+        getContentPane().setBackground(new Color(230, 245, 255));
 
         JLabel titleLabel = new JLabel("Create Account");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setBounds(115, 25, 220, 35);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 26));
+        titleLabel.setBounds(120, 25, 230, 35);
         add(titleLabel);
 
-        JLabel nameLabel = new JLabel("Name:");
-        nameLabel.setBounds(60, 85, 100, 25);
-        add(nameLabel);
+        JLabel fullNameLabel = new JLabel("Full Name:");
+        fullNameLabel.setBounds(65, 85, 110, 25);
+        add(fullNameLabel);
 
-        nameField = new JTextField();
-        nameField.setBounds(160, 85, 190, 25);
-        add(nameField);
+        fullNameField = new JTextField();
+        fullNameField.setBounds(185, 85, 180, 28);
+        add(fullNameField);
 
         JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setBounds(60, 125, 100, 25);
+        emailLabel.setBounds(65, 125, 110, 25);
         add(emailLabel);
 
         emailField = new JTextField();
-        emailField.setBounds(160, 125, 190, 25);
+        emailField.setBounds(185, 125, 180, 28);
         add(emailField);
 
+        JLabel phoneNumberLabel = new JLabel("Phone Number:");
+        phoneNumberLabel.setBounds(65, 165, 110, 25);
+        add(phoneNumberLabel);
+
+        phoneNumberField = new JTextField();
+        phoneNumberField.setBounds(185, 165, 180, 28);
+        add(phoneNumberField);
+
         JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setBounds(60, 165, 100, 25);
+        usernameLabel.setBounds(65, 205, 110, 25);
         add(usernameLabel);
 
         usernameField = new JTextField();
-        usernameField.setBounds(160, 165, 190, 25);
+        usernameField.setBounds(185, 205, 180, 28);
         add(usernameField);
 
         JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setBounds(60, 205, 100, 25);
+        passwordLabel.setBounds(65, 245, 110, 25);
         add(passwordLabel);
 
         passwordField = new JPasswordField();
-        passwordField.setBounds(160, 205, 190, 25);
+        passwordField.setBounds(185, 245, 180, 28);
         add(passwordField);
+
+        JLabel confirmPasswordLabel = new JLabel("Confirm Password:");
+        confirmPasswordLabel.setBounds(65, 285, 120, 25);
+        add(confirmPasswordLabel);
+
+        confirmPasswordField = new JPasswordField();
+        confirmPasswordField.setBounds(185, 285, 180, 28);
+        add(confirmPasswordField);
 
         JLabel noteLabel = new JLabel("Password must be at least 6 characters");
         noteLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        noteLabel.setBounds(160, 232, 230, 20);
+        noteLabel.setBounds(185, 315, 240, 20);
         add(noteLabel);
 
         registerButton = new JButton("Register");
-        registerButton.setBounds(85, 280, 110, 32);
+        registerButton.setBounds(95, 395, 115, 35);
         registerButton.addActionListener(this);
         add(registerButton);
 
         backButton = new JButton("Back");
-        backButton.setBounds(220, 280, 110, 32);
+        backButton.setBounds(235, 395, 115, 35);
         backButton.addActionListener(this);
         add(backButton);
 
@@ -79,21 +98,27 @@ public class RegisterFrame extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == registerButton) {
-            String name = nameField.getText().trim();
+            String fullName = fullNameField.getText().trim();
             String email = emailField.getText().trim();
+            String phoneNumber = phoneNumberField.getText().trim();
             String username = usernameField.getText().trim();
             String password = new String(passwordField.getPassword());
+            String confirmPassword = new String(confirmPasswordField.getPassword());
 
-            if (name.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+            if (fullName.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "All fields are required");
-            } else if (name.contains(",") || email.contains(",") || username.contains(",") || password.contains(",")) {
+            } else if (fullName.contains(",") || email.contains(",") || phoneNumber.contains(",") || username.contains(",") || password.contains(",") || confirmPassword.contains(",")) {
                 JOptionPane.showMessageDialog(this, "Comma is not allowed");
-            } else if (!email.contains("@") || !email.contains(".")) {
-                JOptionPane.showMessageDialog(this, "Enter a valid email");
+            } else if (!isValidEmail(email)) {
+                JOptionPane.showMessageDialog(this, "Enter a valid email address");
+            } else if (!isValidPhoneNumber(phoneNumber)) {
+                JOptionPane.showMessageDialog(this, "Phone number must be 11 digits");
             } else if (password.length() < 6) {
                 JOptionPane.showMessageDialog(this, "Password must be at least 6 characters");
+            } else if (!password.equals(confirmPassword)) {
+                JOptionPane.showMessageDialog(this, "Confirm password does not match");
             } else {
-                User user = new User(name, email, username, password);
+                User user = new User(fullName, email, phoneNumber, username, password);
                 boolean success = userManager.registerUser(user);
 
                 if (success) {
@@ -110,5 +135,23 @@ public class RegisterFrame extends JFrame implements ActionListener {
             dispose();
             new LoginFrame();
         }
+    }
+
+    public boolean isValidEmail(String email) {
+        return email.contains("@") && email.contains(".") && email.indexOf("@") > 0 && email.lastIndexOf(".") > email.indexOf("@");
+    }
+
+    public boolean isValidPhoneNumber(String phoneNumber) {
+        if (phoneNumber.length() != 11) {
+            return false;
+        }
+
+        for (int i = 0; i < phoneNumber.length(); i++) {
+            if (!Character.isDigit(phoneNumber.charAt(i))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

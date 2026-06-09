@@ -10,6 +10,12 @@ public class Pipe extends GameObject {
         passed = false;
     }
 
+    public Pipe(int x, int y, int width, int height, Image image, int velocityX) {
+        super(x, y, width, height, image);
+        this.velocityX = velocityX;
+        passed = false;
+    }
+
     public void move() {
         x += velocityX;
     }
